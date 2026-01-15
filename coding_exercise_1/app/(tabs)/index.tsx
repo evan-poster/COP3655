@@ -9,7 +9,7 @@ import { View, TouchableOpacity } from "react-native";
 import { useState } from "react";
 
 export default function HomeScreen() {
-  const [baseAmount, setBaseAmount] = useState(0);
+  const [billAmount, setbillAmount] = useState(0);
   const [tipRate, setTipRate] = useState(0.2);
   return (
     <ParallaxScrollView
@@ -25,6 +25,19 @@ export default function HomeScreen() {
         <ThemedText type="title">Tip Calculator</ThemedText>
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
+        <ThemedText type="subtitle">Enter Total Bill Amount:</ThemedText>
+        <TextInput
+          style={styles.input}
+          placeholder="e.g. 100"
+          keyboardType="numeric"
+          onChangeText={(text) => {
+            const amount = parseFloat(text);
+            if (isNaN(amount)) {
+              return;
+            }
+            setbillAmount(amount);
+          }}
+        />
         <ThemedView style={styles.selectorContainer}>
           <ThemedText type="subtitle">Select Tip Rate:</ThemedText>
           <View style={styles.selectorRow}>
@@ -51,20 +64,7 @@ export default function HomeScreen() {
             />
           </View>
         </ThemedView>
-        <ThemedText type="subtitle">Enter Total Bill Amount:</ThemedText>
-        <TextInput
-          style={styles.input}
-          placeholder="e.g. 100"
-          keyboardType="numeric"
-          onChangeText={(text) => {
-            const amount = parseFloat(text);
-            if (isNaN(amount)) {
-              return;
-            }
-            setBaseAmount(amount);
-          }}
-        />
-        <ThemedText type="subtitle">Tip Amount: ${(baseAmount * tipRate).toFixed(2)}</ThemedText>
+        <ThemedText type="subtitle">Tip Amount: ${(billAmount * tipRate).toFixed(2)}</ThemedText>
       </ThemedView>
     </ParallaxScrollView>
   );
