@@ -1,16 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
 import { NoteItem } from '@/components/note-item';
+import { FloatingActionButton } from '@/components/floating-action-button';
+import { AddNoteModal } from '@/components/add-note-modal';
 import { useNotes } from '@/hooks/use-notes';
 import { Note } from '@/types';
 
 export default function NotesScreen() {
+  const [modalVisible, setModalVisible] = useState(false);
   const { notes, loading } = useNotes();
 
   const handleNotePress = (note: Note) => {
     console.log('Note pressed:', note.title);
+  };
+
+  const handleNoteAdded = () => {
+    // Modal will close automatically, data updates via Firebase listener
+    console.log('Note added successfully');
   };
 
   return (
@@ -24,7 +32,7 @@ export default function NotesScreen() {
           <ActivityIndicator size="large" />
         </View>
       ) : (
-        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+        <ScrollView style={styles.scrollView} contentContainerStyle={[styles.scrollContent, { paddingBottom: 80 }]}>
           {notes.map((note) => (
             <NoteItem
               key={note.id}
@@ -41,6 +49,14 @@ export default function NotesScreen() {
           )}
         </ScrollView>
       )}
+
+      <FloatingActionButton onPress={() => setModalVisible(true)} />
+      
+      <AddNoteModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        onSubmit={handleNoteAdded}
+      />
     </ThemedView>
   );
 }

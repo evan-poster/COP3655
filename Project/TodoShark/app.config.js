@@ -39,6 +39,7 @@ export default {
           },
         },
       ],
+      "@react-native-community/datetimepicker",
     ],
     experiments: {
       typedRoutes: true,

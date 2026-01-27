@@ -5,12 +5,15 @@ import { ThemedText } from '@/components/themed-text';
 import { ModeToggle } from '@/components/mode-toggle';
 import { TaskBucket } from '@/components/task-bucket';
 import { TaskCard } from '@/components/task-card';
+import { FloatingActionButton } from '@/components/floating-action-button';
+import { AddTaskModal } from '@/components/add-task-modal';
 import { Task, TaskMode, HuntAction } from '@/types';
 import { useTasks } from '@/hooks/use-tasks';
 
 export default function TasksScreen() {
   const [mode, setMode] = useState<TaskMode>('plan');
   const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
+  const [modalVisible, setModalVisible] = useState(false);
   const { tasks, loading, error } = useTasks();
 
   const activeTasks = tasks.filter(task => task.bucket === 'active');
@@ -29,6 +32,11 @@ export default function TasksScreen() {
     } else {
       setCurrentTaskIndex(0);
     }
+  };
+
+  const handleTaskAdded = () => {
+    // Modal will close automatically, data updates via Firebase listener
+    console.log('Task added successfully');
   };
 
   if (loading) {
@@ -52,7 +60,7 @@ export default function TasksScreen() {
       </View>
 
       {mode === 'plan' ? (
-        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+        <ScrollView style={styles.scrollView} contentContainerStyle={[styles.scrollContent, { paddingBottom: 80 }]}>
           <TaskBucket
             title="Active"
             tasks={activeTasks}
@@ -92,6 +100,14 @@ export default function TasksScreen() {
           )}
         </ScrollView>
       )}
+
+      <FloatingActionButton onPress={() => setModalVisible(true)} />
+      
+      <AddTaskModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        onSubmit={handleTaskAdded}
+      />
     </ThemedView>
   );
 }
