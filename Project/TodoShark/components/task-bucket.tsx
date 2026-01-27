@@ -9,9 +9,10 @@ interface TaskBucketProps {
   title: string;
   tasks: Task[];
   onTaskPress: (task: Task) => void;
+  renderTask?: (task: Task) => React.ReactElement;
 }
 
-export function TaskBucket({ title, tasks, onTaskPress }: TaskBucketProps) {
+export function TaskBucket({ title, tasks, onTaskPress, renderTask }: TaskBucketProps) {
   return (
     <ThemedView style={styles.container}>
       <View style={styles.header}>
@@ -20,12 +21,16 @@ export function TaskBucket({ title, tasks, onTaskPress }: TaskBucketProps) {
       </View>
       <View style={styles.taskList}>
         {tasks.map((task) => (
-          <TaskCard
-            key={task.id}
-            task={task}
-            mode="compact"
-            onPress={() => onTaskPress(task)}
-          />
+          renderTask ? (
+            renderTask(task)
+          ) : (
+            <TaskCard
+              key={task.id}
+              task={task}
+              mode="compact"
+              onPress={() => onTaskPress(task)}
+            />
+          )
         ))}
         {tasks.length === 0 && (
           <ThemedText style={styles.emptyText}>No tasks in this bucket</ThemedText>
