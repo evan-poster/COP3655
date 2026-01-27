@@ -17,13 +17,21 @@ import { Note, Reminder, Task } from '@/types';
 
 const noteConverter: FirestoreDataConverter<Note> = {
   toFirestore(note: Note): DocumentData {
-    return {
+    const data: DocumentData = {
       title: note.title,
-      content: note.content,
-      tags: note.tags || [],
       createdAt: Timestamp.fromDate(note.createdAt),
       updatedAt: Timestamp.fromDate(note.updatedAt),
     };
+    
+    if (note.content !== undefined) {
+      data.content = note.content;
+    }
+    
+    if (note.tags && note.tags.length > 0) {
+      data.tags = note.tags;
+    }
+    
+    return data;
   },
   fromFirestore(snapshot: QueryDocumentSnapshot): Note {
     const data = snapshot.data();
@@ -74,10 +82,14 @@ const reminderConverter: FirestoreDataConverter<Reminder> = {
   toFirestore(reminder: Reminder): DocumentData {
     const data: DocumentData = {
       title: reminder.title,
-      description: reminder.description,
       dateTime: Timestamp.fromDate(reminder.dateTime),
       completed: reminder.completed,
     };
+    
+    if (reminder.description !== undefined) {
+      data.description = reminder.description;
+    }
+    
     if (reminder.recurring) {
       data.recurring = {
         frequency: reminder.recurring.frequency,
@@ -223,4 +235,5 @@ export async function getTasks(): Promise<Task[]> {
 }
 
 export { noteConverter, notesCollection, reminderConverter, remindersCollection, taskConverter, tasksCollection };
+
 

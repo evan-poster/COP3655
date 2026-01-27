@@ -54,11 +54,6 @@ export function AddNoteModal({ visible, onClose, onSubmit }: AddNoteModalProps) 
       return;
     }
 
-    if (!content.trim()) {
-      setError('Content is required');
-      return;
-    }
-
     setLoading(true);
     setError('');
 
@@ -71,7 +66,7 @@ export function AddNoteModal({ visible, onClose, onSubmit }: AddNoteModalProps) 
 
       await addNote({
         title: title.trim(),
-        content: content.trim(),
+        content: content.trim() || undefined,
         tags: tags.length > 0 ? tags : undefined,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -130,7 +125,7 @@ export function AddNoteModal({ visible, onClose, onSubmit }: AddNoteModalProps) 
             </View>
 
             <View style={styles.formGroup}>
-              <ThemedText style={styles.label}>Content *</ThemedText>
+              <ThemedText style={styles.label}>Content</ThemedText>
               <TextInput
                 style={[
                   styles.input,
