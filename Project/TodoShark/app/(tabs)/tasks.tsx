@@ -1,83 +1,21 @@
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View, ActivityIndicator } from 'react-native';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
 import { ModeToggle } from '@/components/mode-toggle';
 import { TaskBucket } from '@/components/task-bucket';
 import { TaskCard } from '@/components/task-card';
 import { Task, TaskMode, HuntAction } from '@/types';
-
-const MOCK_TASKS: Task[] = [
-  // Active bucket
-  {
-    id: '1',
-    title: 'Complete website redesign',
-    description: 'Finish homepage mockups and get team feedback',
-    bucket: 'active',
-    priority: 1,
-    createdAt: new Date('2026-01-25'),
-  },
-  {
-    id: '2',
-    title: 'Review pull requests',
-    description: 'Check and approve pending PRs from team',
-    bucket: 'active',
-    priority: 2,
-    createdAt: new Date('2026-01-25'),
-  },
-  {
-    id: '3',
-    title: 'Update documentation',
-    description: 'Add API documentation for new endpoints',
-    bucket: 'active',
-    priority: 3,
-    createdAt: new Date('2026-01-24'),
-  },
-  
-  // Waiting bucket
-  {
-    id: '4',
-    title: 'Client feedback on proposal',
-    description: 'Waiting for client to review and approve',
-    bucket: 'waiting',
-    priority: 2,
-    createdAt: new Date('2026-01-23'),
-  },
-  {
-    id: '5',
-    title: 'Server upgrade approval',
-    description: 'Pending IT department approval',
-    bucket: 'waiting',
-    priority: 3,
-    createdAt: new Date('2026-01-22'),
-  },
-  
-  // Deferred bucket
-  {
-    id: '6',
-    title: 'Research new frameworks',
-    description: 'Explore options for next project',
-    bucket: 'deferred',
-    priority: 4,
-    createdAt: new Date('2026-01-20'),
-  },
-  {
-    id: '7',
-    title: 'Organize team building event',
-    description: 'Plan Q2 team outing',
-    bucket: 'deferred',
-    priority: 5,
-    createdAt: new Date('2026-01-18'),
-  },
-];
+import { useTasks } from '@/hooks/use-tasks';
 
 export default function TasksScreen() {
   const [mode, setMode] = useState<TaskMode>('plan');
   const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
+  const { tasks, loading, error } = useTasks();
 
-  const activeTasks = MOCK_TASKS.filter(task => task.bucket === 'active');
-  const waitingTasks = MOCK_TASKS.filter(task => task.bucket === 'waiting');
-  const deferredTasks = MOCK_TASKS.filter(task => task.bucket === 'deferred');
+  const activeTasks = tasks.filter(task => task.bucket === 'active');
+  const waitingTasks = tasks.filter(task => task.bucket === 'waiting');
+  const deferredTasks = tasks.filter(task => task.bucket === 'deferred');
 
   const handleTaskPress = (task: Task) => {
     console.log('Task pressed:', task.title);
@@ -92,6 +30,19 @@ export default function TasksScreen() {
       setCurrentTaskIndex(0);
     }
   };
+
+  if (loading) {
+    return (
+      <ThemedView style={styles.container}>
+        <View style={styles.header}>
+          <ThemedText style={styles.headerTitle}>Tasks</ThemedText>
+        </View>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" />
+        </View>
+      </ThemedView>
+    );
+  }
 
   return (
     <ThemedView style={styles.container}>
@@ -188,5 +139,10 @@ const styles = StyleSheet.create({
   emptyHuntText: {
     fontSize: 18,
     opacity: 0.6,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
