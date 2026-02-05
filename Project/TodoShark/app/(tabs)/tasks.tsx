@@ -11,6 +11,7 @@ import { TaskDetailModal } from '@/components/task-detail-modal';
 import { EditTaskModal } from '@/components/edit-task-modal';
 import { DeleteConfirmationDialog } from '@/components/delete-confirmation-dialog';
 import { SwipeableItem } from '@/components/swipeable-item';
+import { SwipeableTaskCard } from '@/components/swipeable-task-card';
 import { Task, TaskMode, HuntAction } from '@/types';
 import { useTasks } from '@/hooks/use-tasks';
 import { deleteTask } from '@/services/firebase';
@@ -164,15 +165,16 @@ export default function TasksScreen() {
         <ScrollView style={styles.scrollView} contentContainerStyle={styles.huntContent}>
           {activeTasks.length > 0 ? (
             <>
-              <ThemedText style={styles.huntTitle}>Current Task</ThemedText>
-              <TaskCard
+              <View style={styles.huntHeader}>
+                <ThemedText style={styles.huntTitle}>Current Task</ThemedText>
+                <ThemedText style={styles.huntCounter}>
+                  {currentTaskIndex + 1} of {activeTasks.length}
+                </ThemedText>
+              </View>
+              <SwipeableTaskCard
                 task={activeTasks[currentTaskIndex]}
-                mode="full"
                 onAction={handleHuntAction}
               />
-              <ThemedText style={styles.huntCounter}>
-                {currentTaskIndex + 1} of {activeTasks.length}
-              </ThemedText>
             </>
           ) : (
             <View style={styles.emptyHunt}>
@@ -253,16 +255,20 @@ const styles = StyleSheet.create({
     padding: 20,
     flex: 1,
   },
+  huntHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
   huntTitle: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 16,
   },
   huntCounter: {
     fontSize: 16,
-    textAlign: 'center',
-    marginTop: 16,
     opacity: 0.6,
+    fontWeight: '600',
   },
   emptyHunt: {
     flex: 1,
@@ -279,3 +285,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
+

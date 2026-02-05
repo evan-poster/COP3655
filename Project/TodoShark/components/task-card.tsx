@@ -19,11 +19,15 @@ export function TaskCard({ task, mode, onPress, onAction }: TaskCardProps) {
 
   if (mode === 'compact') {
     return (
-      <TouchableOpacity onPress={onPress}>
+      <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
         <ThemedView style={[styles.compactCard, { backgroundColor: surfaceColor }]}>
           <View style={styles.compactContent}>
-            <ThemedText style={styles.compactTitle}>{task.title}</ThemedText>
-            <ThemedText style={styles.priority}>P{task.priority}</ThemedText>
+            <ThemedText style={styles.compactTitle} numberOfLines={2}>
+              {task.title}
+            </ThemedText>
+            <View style={styles.priorityBadge}>
+              <ThemedText style={styles.priority}>{task.priority}</ThemedText>
+            </View>
           </View>
         </ThemedView>
       </TouchableOpacity>
@@ -42,57 +46,44 @@ export function TaskCard({ task, mode, onPress, onAction }: TaskCardProps) {
           <ThemedText style={styles.metadataText}>Bucket: {task.bucket}</ThemedText>
         </View>
       </View>
-      
-      {onAction && (
-        <View style={styles.actionButtons}>
-          <TouchableOpacity
-            style={[styles.actionButton, { backgroundColor: '#4CAF50' }]}
-            onPress={() => onAction('complete')}
-          >
-            <ThemedText style={styles.actionButtonText}>✓ Mark Down</ThemedText>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.actionButton, { backgroundColor: tintColor }]}
-            onPress={() => onAction('putBack')}
-          >
-            <ThemedText style={styles.actionButtonText}>↻ Put Back</ThemedText>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.actionButton, { backgroundColor: '#FF9800' }]}
-            onPress={() => onAction('takeOut')}
-          >
-            <ThemedText style={styles.actionButtonText}>✕ Take Out</ThemedText>
-          </TouchableOpacity>
-        </View>
-      )}
     </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
   compactCard: {
-    padding: 12,
-    borderRadius: 8,
+    padding: 16,
+    borderRadius: 12,
     marginBottom: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
     elevation: 2,
   },
   compactContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 12,
   },
   compactTitle: {
     fontSize: 16,
     flex: 1,
+    lineHeight: 22,
+  },
+  priorityBadge: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: 'rgba(128, 128, 128, 0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   priority: {
-    fontSize: 12,
-    opacity: 0.6,
-    marginLeft: 8,
+    fontSize: 13,
+    fontWeight: '600',
+    opacity: 0.7,
   },
   fullCard: {
     padding: 20,
@@ -125,17 +116,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     opacity: 0.6,
   },
-  actionButtons: {
-    gap: 12,
-  },
-  actionButton: {
-    padding: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  actionButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
 });
+

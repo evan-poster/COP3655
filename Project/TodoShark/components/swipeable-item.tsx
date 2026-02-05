@@ -4,8 +4,8 @@ import {
   StyleSheet,
   Animated,
   PanResponder,
-  TouchableOpacity,
 } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { ThemedText } from '@/components/themed-text';
 
 interface SwipeableItemProps {
@@ -21,6 +21,7 @@ export function SwipeableItem({
 }: SwipeableItemProps) {
   const translateX = useRef(new Animated.Value(0)).current;
   const lastOffset = useRef(0);
+  const hapticTriggered = useRef(false);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -32,11 +33,18 @@ export function SwipeableItem({
       onPanResponderGrant: () => {
         translateX.setOffset(lastOffset.current);
         translateX.setValue(0);
+        hapticTriggered.current = false;
       },
       onPanResponderMove: (_, gestureState) => {
         // Only allow left swipe (negative dx)
         if (gestureState.dx < 0) {
           translateX.setValue(gestureState.dx);
+          
+          // Trigger haptic feedback at threshold
+          if (gestureState.dx < -deleteThreshold && !hapticTriggered.current) {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            hapticTriggered.current = true;
+          }
         }
       },
       onPanResponderRelease: (_, gestureState) => {
@@ -46,9 +54,10 @@ export function SwipeableItem({
         
         // If swiped past threshold, trigger delete
         if (currentValue < -deleteThreshold) {
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
           Animated.timing(translateX, {
-            toValue: -300,
-            duration: 200,
+            toValue: -400,
+            duration: 250,
             useNativeDriver: true,
           }).start(() => {
             onDelete();
@@ -66,15 +75,25 @@ export function SwipeableItem({
           }).start();
           lastOffset.current = 0;
         }
+        
+        hapticTriggered.current = false;
       },
     })
   ).current;
 
+  // Calculate opacity for delete indicator
+  const deleteOpacity = translateX.interpolate({
+    inputRange: [-deleteThreshold, 0],
+    outputRange: [1, 0.3],
+    extrapolate: 'clamp',
+  });
+
   return (
     <View style={styles.container}>
-      <View style={styles.deleteBackground}>
+      <Animated.View style={[styles.deleteBackground, { opacity: deleteOpacity }]}>
+        <ThemedText style={styles.deleteIcon}>🗑️</ThemedText>
         <ThemedText style={styles.deleteText}>Delete</ThemedText>
-      </View>
+      </Animated.View>
       <Animated.View
         style={[
           styles.swipeableContent,
@@ -102,13 +121,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#D32F2F',
     justifyContent: 'center',
     alignItems: 'flex-end',
-    paddingRight: 20,
-    borderRadius: 8,
+    paddingRight: 24,
+    borderRadius: 12,
     width: '100%',
+    flexDirection: 'row',
+    gap: 8,
+  },
+  deleteIcon: {
+    fontSize: 20,
   },
   deleteText: {
     color: '#FFFFFF',
-    fontWeight: 'bold',
+    fontWeight: '600',
     fontSize: 16,
   },
   swipeableContent: {
